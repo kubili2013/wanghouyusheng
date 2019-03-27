@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link rel="shortcut icon" href="css/heart.png" type="image/x-icon">
+    <style type="text/css">
+        body,
+        html,
+        #allmap {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            font-family: "微软雅黑";
+        }
+
+        .BMap_Marker>div>img {
+            border-radius: 90%;
+            border: 2px solid #eee;
+            width: 100%;
+            height: 100%;
+        }
+
+        .danmu {
+        position: fixed;
+        left: 100%;
+        animation: danmu 15s linear 0s 1;
+        }
+
+        @keyframes danmu {
+        from {
+            left: 100%;
+            transform: translateX(0);
+        }
+        to {
+            left: 0;
+            transform: translateX(-100%);
+        }
+        }
+    </style>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="photo/photoswipe.css">
+    <link rel="stylesheet" href="photo/default-skin/default-skin.css">
+    <script src="photo/photoswipe.min.js"></script>
+    <script src="photo/photoswipe-ui-default.min.js"></script>
+    <script type="text/javascript"
+        src="http://api.map.baidu.com/api?v=2.0&ak={你的百度API秘钥}"></script>
+    <title>往后余生-我陪你！</title>
+</head>
+
+<body>
+    <div id="title_tag" style="display:none;border-radius:16px; position:absolute;text-align: center; line-height:32px;padding:2px 10px 2px 12px;font-size:18px;color:#fff;text-shadow: #000 1px 1px 2px;background:rgba(0, 0, 0, 0.8);z-index:999;"></div>
+    <div id="danmuqingshu" style=""></div>
+    <div>
+        <!-- 音乐循环播放 自动播放 -->
+        <audio id="music_player" src="mp3/wanghouyusheng.mp3" loop autoplay>
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+    <div
+        style="position: absolute;top:20px;right:20px;line-height: 32px; z-index: 999;border-radius: 18px;background: rgba(0, 0, 0, 0.8);padding:2px 10px 0px 10px;box-shadow:  1px 3px 1px rgb(10, 10, 10);">
+        <div
+            style="color:#fff;font-size:18px;font-weight:600;line-height: 32px;width:240px;display: inline-block;text-align: center;">
+            <p style="margin:0px;text-shadow: rgba(0, 0, 0, 0.9) 1px 1px 2px;">我们在一起<span
+                    style="color: red">❤</span><span id="loved_date"></span><span style="color: red">❤</span>天了</p>
+        </div>
+        <a href="javascript:void(0);" style="width:32px;height:32px;margin-right:10px;display: inline-block;"
+            onclick="OpenCloseMusic()"><img id="music_btn" class="avg-animation-all-flash" src="css/music.png" alt=""
+                style="width:30px;margin-top:-3px; vertical-align: middle;"></a>
+    </div>
+    <div id="allmap"></div>
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="pswp__bg"></div>
+        <div class="pswp__scroll-wrap">
+            <div class="pswp__container">
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+            </div>
+            <div class="pswp__ui pswp__ui--hidden">
+                <div class="pswp__top-bar">
+                    <div class="pswp__counter"></div>
+                    <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                    <button class="pswp__button pswp__button--share" title="Share"></button>
+                    <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                    <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                    <div class="pswp__preloader">
+                        <div class="pswp__preloader__icn">
+                            <div class="pswp__preloader__cut">
+                                <div class="pswp__preloader__donut"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                    <div class="pswp__share-tooltip"></div>
+                </div>
+                <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+                </button>
+                <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+                </button>
+                <div class="pswp__caption">
+                    <div class="pswp__caption__center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="data/data.js"></script>
+    <script type="text/javascript">
+        function StrToDom(arg) {
+            var objE = document.createElement("div");
+            objE.innerHTML = arg;
+            return objE.childNodes[0];
+        }
+        // 这段代码是CV过来的，改了方法名，如果这玩意有版权，告诉我，我改！
+        function RandomColor() {
+            return '' +
+                (function(color) {
+                    return (color += '0123456789abcdef' [Math.floor(Math.random() * 16)]) && (color.length == 6) ? color : arguments.callee(color);
+                })('');
+        }
+        document.body.addEventListener('touchmove' , function(e){ 
+            e.preventDefault(); 
+        })
+        var mapStyle = {
+            features: ["road", "building", "water", "land"],//隐藏地图上的poi
+            style: "light"  //设置地图风格
+        }
+        // 百度地图API功能
+        var map = new BMap.Map("allmap");
+        map.setMapStyle(mapStyle);
+        var point = new BMap.Point(120.62, 31.32);
+        map.centerAndZoom(point, 6);
+        map.enableScrollWheelZoom(true);
+        function addMarker(point, data) {
+            var myIcon = new BMap.Icon("css/marker.png", new BMap.Size(30, 30));
+            var marker = new BMap.Marker(point, { icon: myIcon });
+            // marker.setTitle(data.title)
+            // marker.setLabel(data.title)
+            // marker.png
+            map.addOverlay(marker);
+            marker.addEventListener("click", ShowDiary);
+            marker.addEventListener("mouseover", function(e){
+                var p = e.target;
+                var data = GetData(p.getPosition().lng, p.getPosition().lat);
+                var span = document.getElementById('title_tag');
+                span.innerText = data.title;
+                span.style.display = "inline-block";
+                span.style.top = movey + "px";
+                span.style.left = movex + "px";
+
+            });
+            marker.addEventListener("mouseout", function(e){
+                var span = document.getElementById('title_tag');
+                span.style.display = "none";
+
+            });
+        }
+        //获取覆盖物位置
+        function ShowDiary(e) {
+            var p = e.target;
+            var data = GetData(p.getPosition().lng, p.getPosition().lat);
+            var pswpElement = document.querySelectorAll('.pswp')[0];
+            var options = {
+                // optionName: 'option value'
+                // for example:
+                index: 0 // start at first slide
+            };
+            
+            // Initializes and opens PhotoSwipe
+            var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, data.photos, options);
+            gallery.init();
+        }
+
+        for (var i = 0; i < data.length; i++) {
+            var point = new BMap.Point(data[i].longitude, data[i].latitude);
+            addMarker(point, data[i]);
+        }
+        var music_play_flag = true;
+        function OpenCloseMusic() {
+            var player = document.getElementById('music_player');
+            if (music_play_flag) {
+                player.pause();
+                music_play_flag = false;
+                music_btn.src = "css/music-close.png";
+                music_btn.classList.remove("avg-animation-all-flash");
+            } else {
+                player.play();
+                music_play_flag = true;
+                music_btn.src = "css/music.png";
+                music_btn.classList.add("avg-animation-all-flash");
+            }
+        }
+        function GetDate() {
+            // 这块写在一起的日子，自动计算在一起多少天了
+            var dateBegin = new Date("2016/09/20 00:00:00");
+            var dateEnd = new Date();
+            var dateDiff = dateEnd.getTime() - dateBegin.getTime();
+            var dayDiff = Math.floor(dateDiff / (24 * 3600 * 1000));
+            document.getElementById('loved_date').innerText = dayDiff;
+        }
+        GetDate();
+
+        var qingshu = [
+            "我爱你！",
+            // 你动人的情书写在这里，字符串数组，每一句话都有一个类似弹幕的东西飘过。
+        ];
+        var html = '<div class="danmu" style="position:absolute;top:{top}px;z-index:999;right:0px;min-width:1000px;">'
+            + '<div style="position: relative;line-height:32px;height:32px;width:32px;z-index:999; border:2px solid #eee;color:#000;text-shadow: rgba(0, 0, 0, 0.9) 1px 1px 1px;text-align: center; border-radius:50%;background:{c1};display: inline-block;font-size:18px;font-weight:600;">{first}</div>'
+            + '<div style = "white-space:nowrap;position:relative;line-height:32px;z-index:-1;border-radius:0 16px 16px 0;margin-left:-16px;padding-left:18px;height:32px;background:rgba(224, 224, 224, 0.9);display: inline-block;text-align: left;padding-right:10px;color:#000;text-shadow: rgba(0, 0, 0, 0.9) 1px 1px 2px;font-weight:600;">{second}</div>'
+            + '</div>';
+
+        for (var i = 0; i < qingshu.length; i++) {
+            let f = qingshu[i].substring(0, 1);
+            let s = qingshu[i].substring(1);
+            let temp = html.replace("{first}", f);
+            temp = temp.replace("{second}", s);
+            temp = temp.replace("{top}", Math.ceil(Math.random()*15)*32+100);
+            let c1 = RandomColor();
+            let c2 = RandomColor();
+            temp = temp.replace("{c1}", "#" + c1);
+            // temp = temp.replace("{c2}", "#" + c2);
+            setTimeout("document.getElementById('danmuqingshu').appendChild(StrToDom('"+temp+"'))", i * 3 *1000);
+            // document.getElementById('danmuqingshu').appendChild(StrToDom(temp));
+        }
+        var movex; var movey;                     //用来接受鼠标位置的全局变量
+        function mousemove(e)
+        {
+            e=e  || window.event;
+            if(e.pageX || e.pageY)
+            {
+                        movex=e.pageX;
+                        movey=e.pageY 
+            }             
+        }    
+        document.onmousemove=mousemove;
+    </script>
+</body>
+
+</html>

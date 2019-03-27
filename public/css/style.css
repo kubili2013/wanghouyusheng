@@ -1,0 +1,24 @@
+.avg-animation-all-flash{-webkit-animation: 2s infinite ease-in-out; -webkit-animation:2s infinite ease-in-out;-moz-animation:2s infinite ease-in-out;-ms-animation:2s infinite ease-in-out;animation:2s infinite ease-in-out;}
+.avg-animation-all-flash{-webkit-animation-name:allFlash;-moz-animation-name:allFlash;-ms-animation-name:allFlash;animation-name:allFlash;}
+
+/* 不停闪烁 */
+@-webkit-keyframes allFlash{
+    0%{opacity:0.2;}
+    50%{opacity:1;}
+    100%{opacity:0.2;}
+}
+@-moz-keyframes allFlash{
+    0%{opacity:0.2;}
+    50%{opacity:1;}
+    100%{opacity:0.2;}
+}
+@-ms-keyframes allFlash{
+    0%{opacity:0.2;}
+    50%{opacity:1;}
+    100%{opacity:0.2;}
+}
+@keyframes allFlash{
+    0%{opacity:0.2;}
+    50%{opacity:1;}
+    100%{opacity:0.2;}
+}
